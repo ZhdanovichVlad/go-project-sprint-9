@@ -32,14 +32,9 @@ func Generator(ctx context.Context, ch chan<- int64, fn func(int64)) {
 // Worker читает число из канала in и пишет его в канал out.
 func Worker(in <-chan int64, out chan<- int64) {
 	// 2. Функция Worker
-	for {
-		v, ok := <-in
-		time.Sleep(time.Millisecond)
-		if !ok {
-			close(out)
-			return
-		}
-		out <- v
+	defer close(out)
+	for i := range in {
+		out <- i
 	}
 }
 
@@ -109,15 +104,6 @@ func main() {
 		//sum += value
 		sum.Add(value)
 	}
-	//for {
-	//
-	//	number, ok := <-chOut
-	//	if !ok {
-	//		break
-	//	}
-	//	count++
-	//	sum += number
-	//}
 
 	fmt.Println("Количество чисел", inputCount.Load(), count.Load())
 	fmt.Println("Сумма чисел", inputSum.Load(), sum.Load())
